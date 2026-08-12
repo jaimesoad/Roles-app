@@ -60,11 +60,8 @@ export function validateForm(section: DataSection, form: FormState) {
         if (form.priority !== "" && (!Number.isInteger(Number(form.priority)) || Number(form.priority) < 0))
             throw new Error("La prioridad debe ser un número entero igual o mayor que cero.");
     }
-    if (section === "roles" && !form.alias) throw new Error("El alias es obligatorio.");
-    if (section === "usuarios") {
-        if (!form.email) throw new Error("El correo electrónico es obligatorio.");
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) throw new Error("El correo electrónico no es válido.");
-    }
+    if (section === "usuarios" && form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+        throw new Error("El correo electrónico no es válido.");
 }
 
 export function buildSearchFilter(kind: DataSection, value: string) {

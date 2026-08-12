@@ -7,6 +7,5 @@
 <label class="block"
     ><span class="mb-2 block text-sm font-medium">Alias</span><Input
         bind:value={form.alias}
-        required
     /></label
 >

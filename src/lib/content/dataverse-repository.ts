@@ -114,11 +114,12 @@ async function assertCurrentVersion(section: DataSection, id: string, expected?:
         case "roles": version = requireData(await Cre2b_rolsService.get(id, { select: ["versionnumber"] })).versionnumber; break;
         case "usuarios": version = requireData(await Cre2b_usuariosesService.get(id, { select: ["versionnumber"] })).versionnumber; break;
     }
-    if (version !== expected)
+    if (String(version) !== String(expected))
         throw new Error("Este registro fue modificado por otra persona. Actualiza los datos antes de volver a guardar.");
 }
 
 async function assertUniqueFields(section: DataSection, editingId: string | null, form: FormState) {
+    if (section === "usuarios" && !form.email) return;
     const escape = (value: string) => value.replaceAll("'", "''");
     const definitions = {
         aplicaciones: ["cre2b_aplicacionid", `cre2b_nombre eq '${escape(form.name)}'`],

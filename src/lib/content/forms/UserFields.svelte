@@ -7,7 +7,7 @@
 <div class="grid gap-4 sm:grid-cols-2">
     <label
         ><span class="mb-2 block text-sm font-medium">Correo electrónico</span
-        ><Input bind:value={form.email} type="email" required /></label
+        ><Input bind:value={form.email} type="email" /></label
     ><label
         ><span class="mb-2 block text-sm font-medium">Departamento</span><Input
             bind:value={form.department}
