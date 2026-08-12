@@ -39,5 +39,12 @@ export const dataSourcesInfo = {
     "primaryKey": "cre2b_usuarios_rolesid",
     "dataSourceType": "Dataverse",
     "apis": {}
+  },
+  "cre2b_usuarioses": {
+    "tableId": "",
+    "version": "",
+    "primaryKey": "cre2b_usuariosid",
+    "dataSourceType": "Dataverse",
+    "apis": {}
   }
 };

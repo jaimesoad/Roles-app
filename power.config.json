@@ -32,6 +32,10 @@
         "modulos": {
           "entitySetName": "cre2b_modulos",
           "logicalName": "cre2b_modulo"
+        },
+        "usuarioses": {
+          "entitySetName": "cre2b_usuarioses",
+          "logicalName": "cre2b_usuarios"
         }
       },
       "environmentVariableName": ""

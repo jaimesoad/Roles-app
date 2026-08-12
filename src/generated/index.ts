@@ -10,6 +10,7 @@ export * as Cre2b_modulosModel from './models/Cre2b_modulosModel';
 export * as Cre2b_modulos_rolesesModel from './models/Cre2b_modulos_rolesesModel';
 export * as Cre2b_rolsModel from './models/Cre2b_rolsModel';
 export * as Cre2b_usuarios_rolesesModel from './models/Cre2b_usuarios_rolesesModel';
+export * as Cre2b_usuariosesModel from './models/Cre2b_usuariosesModel';
 
 // Services
 export * from './services/Cre2b_aplicacionsService';
@@ -17,3 +18,4 @@ export * from './services/Cre2b_modulosService';
 export * from './services/Cre2b_modulos_rolesesService';
 export * from './services/Cre2b_rolsService';
 export * from './services/Cre2b_usuarios_rolesesService';
+export * from './services/Cre2b_usuariosesService';
