@@ -283,7 +283,7 @@
 <ModeWatcher defaultMode="system" />
 
 <svelte:head
-    ><title>Accessia · Gestión de roles</title><meta
+    ><title>Roles application</title><meta
         name="description"
         content="Administración de aplicaciones, módulos, roles y usuarios"
     /></svelte:head
