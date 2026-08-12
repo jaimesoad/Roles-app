@@ -26,8 +26,8 @@
     import RecordsList from "$lib/content/RecordsList.svelte";
     import EntityFields from "$lib/content/EntityFields.svelte";
     import RelationPicker from "$lib/content/RelationPicker.svelte";
-    import { deleteEntity, fetchEntityCounts, fetchMissingModules, fetchMissingRoles, fetchModuleRoles, fetchPage, fetchUserRoles, initialPageRequests, saveEntity, syncModuleRoles as persistModuleRoles, syncUserRoles as persistUserRoles } from "$lib/accessia/dataverse-repository";
-    import { LatestSearch } from "$lib/accessia/latest-search";
+    import { deleteEntity, fetchEntityCounts, fetchMissingModules, fetchMissingRoles, fetchModuleRoles, fetchPage, fetchUserRoles, initialPageRequests, saveEntity, syncModuleRoles as persistModuleRoles, syncUserRoles as persistUserRoles } from "$lib/content/dataverse-repository";
+    import { LatestSearch } from "$lib/content/latest-search";
 
     let section = $state<Section>("inicio");
     let query = $state("");

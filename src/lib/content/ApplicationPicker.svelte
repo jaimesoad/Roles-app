@@ -5,8 +5,8 @@
     import * as Select from "$lib/components/ui/select/index.js";
     import LoaderCircle from "@lucide/svelte/icons/loader-circle";
     import { toast } from "svelte-sonner";
-    import { fetchApplication, fetchPage } from "$lib/accessia/dataverse-repository";
-    import { LatestSearch } from "$lib/accessia/latest-search";
+    import { fetchApplication, fetchPage } from "$lib/content/dataverse-repository";
+    import { LatestSearch } from "$lib/content/latest-search";
     import type { Cre2b_aplicacions } from "../../generated/models/Cre2b_aplicacionsModel";
 
     let { value = $bindable(), initial }: { value: string; initial: Cre2b_aplicacions[] } = $props();
