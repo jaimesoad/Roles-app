@@ -122,8 +122,19 @@
 	}
 	body {
 		@apply bg-background text-foreground;
+		margin: 0;
+		min-width: 320px;
+		-webkit-font-smoothing: antialiased;
 	}
 	html {
 		@apply font-sans;
+	}
+}
+
+@layer components {
+	[data-sonner-toast][data-type="success"] {
+		background: var(--color-green-100) !important;
+		border-color: var(--color-green-200) !important;
+		color: var(--color-green-800) !important;
 	}
 }

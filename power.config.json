@@ -1,10 +1,10 @@
 {
   "version": "1.0",
   "appId": "d3f7b841-c4b7-4fae-8da7-e30646770d5d",
-  "appDisplayName": "Test code app",
+  "appDisplayName": "Accessia",
   "region": "prod",
   "environmentId": "1991c04f-477b-e1ed-abf7-067b6fa05600",
-  "description": " ",
+  "description": "Gestión de aplicaciones, módulos, roles y usuarios en Dataverse",
   "buildPath": "./dist",
   "buildEntryPoint": "index.html",
   "localAppUrl": "http://localhost:3000",
