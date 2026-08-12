@@ -1,0 +1,40 @@
+{
+  "version": "1.0",
+  "appId": "d3f7b841-c4b7-4fae-8da7-e30646770d5d",
+  "appDisplayName": "Test code app",
+  "region": "prod",
+  "environmentId": "1991c04f-477b-e1ed-abf7-067b6fa05600",
+  "description": " ",
+  "buildPath": "./dist",
+  "buildEntryPoint": "index.html",
+  "localAppUrl": "http://localhost:3000",
+  "logoPath": "Default",
+  "connectionReferences": {},
+  "databaseReferences": {
+    "default.cds": {
+      "dataSources": {
+        "modulos_roleses": {
+          "entitySetName": "cre2b_modulos_roleses",
+          "logicalName": "cre2b_modulos_roles"
+        },
+        "aplicacions": {
+          "entitySetName": "cre2b_aplicacions",
+          "logicalName": "cre2b_aplicacion"
+        },
+        "usuarios_roleses": {
+          "entitySetName": "cre2b_usuarios_roleses",
+          "logicalName": "cre2b_usuarios_roles"
+        },
+        "rols": {
+          "entitySetName": "cre2b_rols",
+          "logicalName": "cre2b_rol"
+        },
+        "modulos": {
+          "entitySetName": "cre2b_modulos",
+          "logicalName": "cre2b_modulo"
+        }
+      },
+      "environmentVariableName": ""
+    }
+  }
+}
