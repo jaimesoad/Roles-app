@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "appId": "d3f7b841-c4b7-4fae-8da7-e30646770d5d",
-  "appDisplayName": "Accessia",
+  "appDisplayName": "Roles application",
   "region": "prod",
   "environmentId": "1991c04f-477b-e1ed-abf7-067b6fa05600",
   "description": "Gestión de aplicaciones, módulos, roles y usuarios en Dataverse",
