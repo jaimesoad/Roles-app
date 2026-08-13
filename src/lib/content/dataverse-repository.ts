@@ -10,7 +10,8 @@ import type { Cre2b_rols } from "../../generated/models/Cre2b_rolsModel";
 import type { Cre2b_usuarioses } from "../../generated/models/Cre2b_usuariosesModel";
 import type { Cre2b_modulos_roleses } from "../../generated/models/Cre2b_modulos_rolesesModel";
 import type { Cre2b_usuarios_roleses } from "../../generated/models/Cre2b_usuarios_rolesesModel";
-import { buildSearchFilter, PAGE_SIZE, validateForm, type DataSection, type FormState, type RawRecord } from "../content/domain";
+import type { Application, EntityRecord, Module, ModuleRole, Role, User, UserRole } from "../data/types";
+import { PAGE_SIZE, validateForm, type DataSection, type FormState } from "../content/domain";
 
 type OperationResult<T> = { success: boolean; data: T; error?: unknown; skipToken?: string };
 type ApplicationCreate = Parameters<typeof Cre2b_aplicacionsService.create>[0];
@@ -20,6 +21,25 @@ type UserCreate = Parameters<typeof Cre2b_usuariosesService.create>[0];
 type ModuleRoleCreate = Parameters<typeof Cre2b_modulos_rolesesService.create>[0];
 type UserRoleCreate = Parameters<typeof Cre2b_usuarios_rolesesService.create>[0];
 
+const mapApplication = (record: Cre2b_aplicacions): Application => ({ id: record.cre2b_aplicacionid, name: record.cre2b_nombre, link: record.cre2b_link, active: record.statecode === 0, version: record.versionnumber });
+const mapModule = (record: Cre2b_modulos): Module => ({ id: record.cre2b_moduloid, name: record.cre2b_nombre, priority: record.cre2b_prioridad, applicationId: record._cre2b_aplicacion_value, applicationName: record.cre2b_aplicacionname, active: record.statecode === 0, version: record.versionnumber });
+const mapRole = (record: Cre2b_rols): Role => ({ id: record.cre2b_rolid, name: record.cre2b_nombre, alias: record.cre2b_alias, active: record.statecode === 0, version: record.versionnumber });
+const mapUser = (record: Cre2b_usuarioses): User => ({ id: record.cre2b_usuariosid, name: record.cre2b_nombre, email: record.cre2b_email, department: record.cre2b_departamento, position: record.cre2b_posicion, active: record.statecode === 0, version: record.versionnumber });
+const mapModuleRole = (record: Cre2b_modulos_roleses): ModuleRole => ({ id: record.cre2b_modulos_rolesid, moduleId: record._cre2b_modulo_value, roleId: record._cre2b_rol_value });
+const mapUserRole = (record: Cre2b_usuarios_roleses): UserRole => ({ id: record.cre2b_usuarios_rolesid, userId: record._cre2b_usuario_value, roleId: record._cre2b_rol_value });
+
+function buildSearchFilter(kind: DataSection, value: string) {
+    const term = value.trim().replaceAll("'", "''");
+    if (!term) return undefined;
+    const contains = (column: string) => `contains(${column},'${term}')`;
+    switch (kind) {
+        case "aplicaciones": return `${contains("cre2b_nombre")} or ${contains("cre2b_link")}`;
+        case "modulos": return contains("cre2b_nombre");
+        case "roles": return `${contains("cre2b_nombre")} or ${contains("cre2b_alias")}`;
+        case "usuarios": return ["cre2b_nombre", "cre2b_email", "cre2b_departamento", "cre2b_posicion"].map(contains).join(" or ");
+    }
+}
+
 export function requireData<T>(result: OperationResult<T>): T {
     if (!result.success) throw result.error ?? new Error("Dataverse no completó la operación.");
     return result.data;
@@ -27,10 +47,10 @@ export function requireData<T>(result: OperationResult<T>): T {
 
 export function initialPageRequests() {
     return [
-        Cre2b_aplicacionsService.getAll({ orderBy: ["cre2b_nombre asc"], top: PAGE_SIZE, maxPageSize: PAGE_SIZE }),
-        Cre2b_modulosService.getAll({ orderBy: ["cre2b_prioridad asc", "cre2b_nombre asc"], top: PAGE_SIZE, maxPageSize: PAGE_SIZE }),
-        Cre2b_rolsService.getAll({ orderBy: ["cre2b_nombre asc"], top: PAGE_SIZE, maxPageSize: PAGE_SIZE }),
-        Cre2b_usuariosesService.getAll({ orderBy: ["cre2b_nombre asc"], top: PAGE_SIZE, maxPageSize: PAGE_SIZE }),
+        Cre2b_aplicacionsService.getAll({ orderBy: ["cre2b_nombre asc"], top: PAGE_SIZE, maxPageSize: PAGE_SIZE }).then((result) => ({ ...result, data: result.data.map(mapApplication) })),
+        Cre2b_modulosService.getAll({ orderBy: ["cre2b_prioridad asc", "cre2b_nombre asc"], top: PAGE_SIZE, maxPageSize: PAGE_SIZE }).then((result) => ({ ...result, data: result.data.map(mapModule) })),
+        Cre2b_rolsService.getAll({ orderBy: ["cre2b_nombre asc"], top: PAGE_SIZE, maxPageSize: PAGE_SIZE }).then((result) => ({ ...result, data: result.data.map(mapRole) })),
+        Cre2b_usuariosesService.getAll({ orderBy: ["cre2b_nombre asc"], top: PAGE_SIZE, maxPageSize: PAGE_SIZE }).then((result) => ({ ...result, data: result.data.map(mapUser) })),
     ] as const;
 }
 
@@ -55,13 +75,13 @@ export async function fetchEntityCounts(): Promise<Record<DataSection, number>> 
     return { aplicaciones, modulos, roles, usuarios };
 }
 
-export async function fetchPage(kind: DataSection, search = "", skipToken?: string): Promise<{ data: RawRecord[]; skipToken?: string }> {
+export async function fetchPage(kind: DataSection, search = "", skipToken?: string): Promise<{ data: EntityRecord[]; skipToken?: string }> {
     const common = { top: PAGE_SIZE, maxPageSize: PAGE_SIZE, skipToken, filter: buildSearchFilter(kind, search) };
     switch (kind) {
-        case "aplicaciones": { const result = await Cre2b_aplicacionsService.getAll({ ...common, orderBy: ["cre2b_nombre asc"] }); return { data: requireData(result), skipToken: result.skipToken }; }
-        case "modulos": { const result = await Cre2b_modulosService.getAll({ ...common, orderBy: ["cre2b_prioridad asc", "cre2b_nombre asc"] }); return { data: requireData(result), skipToken: result.skipToken }; }
-        case "roles": { const result = await Cre2b_rolsService.getAll({ ...common, orderBy: ["cre2b_nombre asc"] }); return { data: requireData(result), skipToken: result.skipToken }; }
-        case "usuarios": { const result = await Cre2b_usuariosesService.getAll({ ...common, orderBy: ["cre2b_nombre asc"] }); return { data: requireData(result), skipToken: result.skipToken }; }
+        case "aplicaciones": { const result = await Cre2b_aplicacionsService.getAll({ ...common, orderBy: ["cre2b_nombre asc"] }); return { data: requireData(result).map(mapApplication), skipToken: result.skipToken }; }
+        case "modulos": { const result = await Cre2b_modulosService.getAll({ ...common, orderBy: ["cre2b_prioridad asc", "cre2b_nombre asc"] }); return { data: requireData(result).map(mapModule), skipToken: result.skipToken }; }
+        case "roles": { const result = await Cre2b_rolsService.getAll({ ...common, orderBy: ["cre2b_nombre asc"] }); return { data: requireData(result).map(mapRole), skipToken: result.skipToken }; }
+        case "usuarios": { const result = await Cre2b_usuariosesService.getAll({ ...common, orderBy: ["cre2b_nombre asc"] }); return { data: requireData(result).map(mapUser), skipToken: result.skipToken }; }
     }
 }
 
@@ -72,16 +92,16 @@ async function fetchAllRelations<T>(request: (skipToken?: string) => Promise<Ope
     return records;
 }
 
-export const fetchModuleRoles = (roleId: string) => fetchAllRelations<Cre2b_modulos_roleses>((skipToken) => Cre2b_modulos_rolesesService.getAll({ filter: `_cre2b_rol_value eq ${roleId}`, top: PAGE_SIZE, maxPageSize: PAGE_SIZE, skipToken }));
-export const fetchUserRoles = (userId: string) => fetchAllRelations<Cre2b_usuarios_roleses>((skipToken) => Cre2b_usuarios_rolesesService.getAll({ filter: `_cre2b_usuario_value eq ${userId}`, top: PAGE_SIZE, maxPageSize: PAGE_SIZE, skipToken }));
+export const fetchModuleRoles = (roleId: string) => fetchAllRelations<Cre2b_modulos_roleses>((skipToken) => Cre2b_modulos_rolesesService.getAll({ filter: `_cre2b_rol_value eq ${roleId}`, top: PAGE_SIZE, maxPageSize: PAGE_SIZE, skipToken })).then((records) => records.map(mapModuleRole));
+export const fetchUserRoles = (userId: string) => fetchAllRelations<Cre2b_usuarios_roleses>((skipToken) => Cre2b_usuarios_rolesesService.getAll({ filter: `_cre2b_usuario_value eq ${userId}`, top: PAGE_SIZE, maxPageSize: PAGE_SIZE, skipToken })).then((records) => records.map(mapUserRole));
 
-export async function fetchMissingModules(ids: string[], loaded: Cre2b_modulos[]) {
-    const missing = ids.filter((id) => !loaded.some((record) => record.cre2b_moduloid === id));
-    return Promise.all(missing.map(async (id) => requireData(await Cre2b_modulosService.get(id))));
+export async function fetchMissingModules(ids: string[], loaded: Module[]) {
+    const missing = ids.filter((id) => !loaded.some((record) => record.id === id));
+    return Promise.all(missing.map(async (id) => mapModule(requireData(await Cre2b_modulosService.get(id)))));
 }
-export async function fetchMissingRoles(ids: string[], loaded: Cre2b_rols[]) {
-    const missing = ids.filter((id) => !loaded.some((record) => record.cre2b_rolid === id));
-    return Promise.all(missing.map(async (id) => requireData(await Cre2b_rolsService.get(id))));
+export async function fetchMissingRoles(ids: string[], loaded: Role[]) {
+    const missing = ids.filter((id) => !loaded.some((record) => record.id === id));
+    return Promise.all(missing.map(async (id) => mapRole(requireData(await Cre2b_rolsService.get(id)))));
 }
 
 export async function saveEntity(section: DataSection, editingId: string | null, form: FormState) {
@@ -140,7 +160,7 @@ async function assertUniqueFields(section: DataSection, editingId: string | null
 }
 
 export async function fetchApplication(id: string) {
-    return requireData(await Cre2b_aplicacionsService.get(id));
+    return mapApplication(requireData(await Cre2b_aplicacionsService.get(id)));
 }
 
 export async function syncModuleRoles(roleId: string, selectedIds: string[]) {
@@ -148,13 +168,13 @@ export async function syncModuleRoles(roleId: string, selectedIds: string[]) {
     const added: string[] = [];
     const removed: string[] = [];
     try {
-        for (const moduleId of selectedIds.filter((id) => !current.some((relation) => relation._cre2b_modulo_value === id))) {
+        for (const moduleId of selectedIds.filter((id) => !current.some((relation) => relation.moduleId === id))) {
             const relation = requireData(await Cre2b_modulos_rolesesService.create({ "cre2b_Modulo@odata.bind": `/cre2b_modulos(${moduleId})`, "cre2b_Rol@odata.bind": `/cre2b_rols(${roleId})` } as ModuleRoleCreate));
             added.push(relation.cre2b_modulos_rolesid);
         }
-        for (const relation of current.filter((item) => !selectedIds.includes(item._cre2b_modulo_value ?? ""))) {
-            await Cre2b_modulos_rolesesService.delete(relation.cre2b_modulos_rolesid);
-            if (relation._cre2b_modulo_value) removed.push(relation._cre2b_modulo_value);
+        for (const relation of current.filter((item) => !selectedIds.includes(item.moduleId ?? ""))) {
+            await Cre2b_modulos_rolesesService.delete(relation.id);
+            if (relation.moduleId) removed.push(relation.moduleId);
         }
     } catch (error) {
         await Promise.allSettled(added.map((id) => Cre2b_modulos_rolesesService.delete(id)));
@@ -167,13 +187,13 @@ export async function syncUserRoles(userId: string, selectedIds: string[]) {
     const added: string[] = [];
     const removed: string[] = [];
     try {
-        for (const roleId of selectedIds.filter((id) => !current.some((relation) => relation._cre2b_rol_value === id))) {
+        for (const roleId of selectedIds.filter((id) => !current.some((relation) => relation.roleId === id))) {
             const relation = requireData(await Cre2b_usuarios_rolesesService.create({ "cre2b_Usuario@odata.bind": `/cre2b_usuarioses(${userId})`, "cre2b_Rol@odata.bind": `/cre2b_rols(${roleId})` } as UserRoleCreate));
             added.push(relation.cre2b_usuarios_rolesid);
         }
-        for (const relation of current.filter((item) => !selectedIds.includes(item._cre2b_rol_value ?? ""))) {
-            await Cre2b_usuarios_rolesesService.delete(relation.cre2b_usuarios_rolesid);
-            if (relation._cre2b_rol_value) removed.push(relation._cre2b_rol_value);
+        for (const relation of current.filter((item) => !selectedIds.includes(item.roleId ?? ""))) {
+            await Cre2b_usuarios_rolesesService.delete(relation.id);
+            if (relation.roleId) removed.push(relation.roleId);
         }
     } catch (error) {
         await Promise.allSettled(added.map((id) => Cre2b_usuarios_rolesesService.delete(id)));

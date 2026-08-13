@@ -54,7 +54,7 @@
     <div
         class="max-h-48 space-y-1 overflow-y-auto rounded-xl border border-border p-2"
     >
-        {#each options as option}<label
+        {#each options as option (option.id)}<label
                 class="flex cursor-pointer items-center gap-3 rounded-lg p-2.5 hover:bg-muted"
                 ><Checkbox
                     checked={selectedIds.includes(option.id)}

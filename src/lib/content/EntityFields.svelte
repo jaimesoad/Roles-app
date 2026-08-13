@@ -1,6 +1,6 @@
 <script lang="ts">
     import Input from "$lib/components/ui/input/input.svelte";
-    import type { Cre2b_aplicacions } from "../../generated/models/Cre2b_aplicacionsModel";
+    import type { Application } from "$lib/data";
     import type { FormState, DataSection } from "./domain";
     import ApplicationFields from "./forms/ApplicationFields.svelte";
     import ModuleFields from "./forms/ModuleFields.svelte";
@@ -13,7 +13,7 @@
     }: {
         section: DataSection;
         form: FormState;
-        applications: Cre2b_aplicacions[];
+        applications: Application[];
     } = $props();
 </script>
 

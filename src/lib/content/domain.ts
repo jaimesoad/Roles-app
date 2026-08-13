@@ -1,13 +1,10 @@
 import { AppWindow, Boxes, ShieldCheck, Users } from "@lucide/svelte";
-import type { Cre2b_aplicacions } from "../../generated/models/Cre2b_aplicacionsModel";
-import type { Cre2b_modulos } from "../../generated/models/Cre2b_modulosModel";
-import type { Cre2b_rols } from "../../generated/models/Cre2b_rolsModel";
-import type { Cre2b_usuarioses } from "../../generated/models/Cre2b_usuariosesModel";
+import type { Application, EntityRecord, Module, Role, User } from "../data/types";
 
 export type Section = "inicio" | "aplicaciones" | "modulos" | "roles" | "usuarios";
 export type DataSection = Exclude<Section, "inicio">;
 export type PageKey = DataSection | "moduleRoles" | "userRoles";
-export type RawRecord = Cre2b_aplicacions | Cre2b_modulos | Cre2b_rols | Cre2b_usuarioses;
+export type RawRecord = EntityRecord;
 
 export type FormState = {
     name: string;
@@ -64,24 +61,12 @@ export function validateForm(section: DataSection, form: FormState) {
         throw new Error("El correo electrónico no es válido.");
 }
 
-export function buildSearchFilter(kind: DataSection, value: string) {
-    const term = value.trim().replaceAll("'", "''");
-    if (!term) return undefined;
-    const contains = (column: string) => `contains(${column},'${term}')`;
-    switch (kind) {
-        case "aplicaciones": return `${contains("cre2b_nombre")} or ${contains("cre2b_link")}`;
-        case "modulos": return contains("cre2b_nombre");
-        case "roles": return `${contains("cre2b_nombre")} or ${contains("cre2b_alias")}`;
-        case "usuarios": return ["cre2b_nombre", "cre2b_email", "cre2b_departamento", "cre2b_posicion"].map(contains).join(" or ");
-    }
-}
-
-export function mapRecords(section: Section, applications: Cre2b_aplicacions[], modules: Cre2b_modulos[], roles: Cre2b_rols[], users: Cre2b_usuarioses[]): ViewRecord[] {
+export function mapRecords(section: Section, applications: Application[], modules: Module[], roles: Role[], users: User[]): ViewRecord[] {
     switch (section) {
-        case "aplicaciones": return applications.map((record) => ({ id: record.cre2b_aplicacionid, name: record.cre2b_nombre ?? "Sin nombre", detail: record.cre2b_link ?? "Sin enlace", relation: record.cre2b_link ?? "—", active: record.statecode === 0, raw: record }));
-        case "modulos": return modules.map((record) => ({ id: record.cre2b_moduloid, name: record.cre2b_nombre ?? "Sin nombre", detail: record.cre2b_prioridad == null ? "Sin prioridad" : `Prioridad ${record.cre2b_prioridad}`, relation: record.cre2b_aplicacionname ?? applications.find((application) => application.cre2b_aplicacionid === record._cre2b_aplicacion_value)?.cre2b_nombre ?? "Sin aplicación", active: record.statecode === 0, raw: record }));
-        case "roles": return roles.map((record) => ({ id: record.cre2b_rolid, name: record.cre2b_nombre ?? "Sin nombre", detail: record.cre2b_alias ?? "Sin alias", relation: "Gestionar módulos", active: record.statecode === 0, raw: record }));
-        case "usuarios": return users.map((record) => ({ id: record.cre2b_usuariosid, name: record.cre2b_nombre ?? "Sin nombre", detail: record.cre2b_email ?? "Sin correo", relation: "Gestionar roles", active: record.statecode === 0, raw: record }));
+        case "aplicaciones": return applications.map((record) => ({ id: record.id, name: record.name ?? "Sin nombre", detail: record.link ?? "Sin enlace", relation: record.link ?? "—", active: record.active, raw: record }));
+        case "modulos": return modules.map((record) => ({ id: record.id, name: record.name ?? "Sin nombre", detail: record.priority == null ? "Sin prioridad" : `Prioridad ${record.priority}`, relation: record.applicationName ?? applications.find((application) => application.id === record.applicationId)?.name ?? "Sin aplicación", active: record.active, raw: record }));
+        case "roles": return roles.map((record) => ({ id: record.id, name: record.name ?? "Sin nombre", detail: record.alias ?? "Sin alias", relation: "Gestionar módulos", active: record.active, raw: record }));
+        case "usuarios": return users.map((record) => ({ id: record.id, name: record.name ?? "Sin nombre", detail: record.email ?? "Sin correo", relation: "Gestionar roles", active: record.active, raw: record }));
         case "inicio": return [];
     }
 }

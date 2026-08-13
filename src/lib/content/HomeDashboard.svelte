@@ -26,7 +26,7 @@
 </section>
 
 <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-    {#each Object.entries(sectionMeta) as [key, item]}
+    {#each Object.entries(sectionMeta) as [key, item] (key)}
         <button
             onclick={() => onNavigate(key as DataSection)}
             class="group flex min-h-56 flex-col rounded-2xl border border-border bg-card p-6 text-left text-card-foreground shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40"
@@ -50,7 +50,7 @@
 <section class="mt-8 rounded-2xl border border-border bg-card p-6">
     <h2 class="font-bold">Registros en Dataverse</h2>
     <div class="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {#each Object.entries(counts) as [key, count]}
+        {#each Object.entries(counts) as [key, count] (key)}
             <div class="rounded-xl bg-muted p-4">
                 <p class="text-2xl font-bold">{loading ? "—" : count}</p>
                 <p class="text-xs text-muted-foreground">

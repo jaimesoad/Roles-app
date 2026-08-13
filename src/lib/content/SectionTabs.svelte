@@ -21,7 +21,7 @@
     class="mb-6"
 >
     <Tabs.List>
-        {#each Object.entries(sectionMeta) as [key, item]}
+        {#each Object.entries(sectionMeta) as [key, item] (key)}
             <Tabs.Trigger
                 value={key}
                 class="relative data-active:bg-transparent data-active:shadow-none dark:data-active:border-transparent dark:data-active:bg-transparent"

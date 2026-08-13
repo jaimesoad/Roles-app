@@ -1,12 +1,12 @@
 <script lang="ts">
     import Input from "$lib/components/ui/input/input.svelte";
     import ApplicationPicker from "../ApplicationPicker.svelte";
-    import type { Cre2b_aplicacions } from "../../../generated/models/Cre2b_aplicacionsModel";
+    import type { Application } from "$lib/data";
     import type { FormState } from "../domain";
     let {
         form = $bindable(),
         applications,
-    }: { form: FormState; applications: Cre2b_aplicacions[] } = $props();
+    }: { form: FormState; applications: Application[] } = $props();
 </script>
 
 <div class="grid gap-4 sm:grid-cols-2">
