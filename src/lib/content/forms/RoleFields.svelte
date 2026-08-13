@@ -5,7 +5,7 @@
 </script>
 
 <label class="block"
-    ><span class="mb-2 block text-sm font-medium">Alias</span><Input
+    ><span class="mb-2 block text-sm font-medium">Categoría</span><Input
         bind:value={form.alias}
     /></label
 >
